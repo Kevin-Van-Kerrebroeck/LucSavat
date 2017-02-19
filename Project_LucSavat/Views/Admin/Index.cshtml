@@ -1,0 +1,76 @@
+﻿@model Project_LucSavat.Models.ViewModels.AdminViewModel
+<style>
+    .main {
+        padding: 10px;
+    }
+</style>
+<div class="container main">
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Prijs</th>
+                        <th>Vehicle ID</th>
+                        <th>Beschrijving</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                @foreach (var z in Model.Zoekertjes)
+                {
+                    <tr>
+                        <td>@z.Id</td>
+                        <td>@z.Title</td>
+                        <td>@z.Prijs</td>
+                        <td>@z.Vehicle.Merk @z.Vehicle.Type</td>
+                        <td>@z.Beschrijving</td>
+                        <td>
+                            @using (Html.BeginForm("DeleteZoekertje", "Admin", new { id = z.Id }))
+                        {
+                            @Html.AntiForgeryToken() 
+                                <input type="submit" class="btn btn-danger" value="D" />
+                        }
+                    </td>
+                </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+<hr />
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Prijs</th>
+                    <th>Vehicle ID</th>
+                    <th>Beschrijving</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            @foreach (var z in Model.Vehicles)
+            {
+                <tr>
+                    <td>@z.Id</td>
+                    <td>@z.KmStand</td>
+                    <td>@z.AantalDeuren</td>
+                    <td>@z.Kleur</td>
+                    <td>@z.Type</td>
+                    <td>
+                        @using (Html.BeginForm("DeleteVehicle", "Admin", new { id = z.Id }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="submit" class="btn btn-danger" value="D" />
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

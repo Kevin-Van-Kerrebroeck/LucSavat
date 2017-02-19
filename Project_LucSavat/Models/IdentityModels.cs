@@ -29,5 +29,9 @@ namespace Project_LucSavat.Models
         {
             return new ApplicationDbContext();
         }
+
+        public DbSet<Zoekertje> Zoekertjes { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Optie> Opties { get; set; }
     }
 }

@@ -1,0 +1,19 @@
+﻿@model IEnumerable<Project_LucSavat.Models.Vehicle>
+<h2>Autos</h2>
+
+<table class="table table-striped table-hover">
+   @foreach (var auto in Model)
+   {
+    <tr>
+        <td>@auto.Id</td>
+        <td>@auto.Merk</td>
+        <td>@auto.Type</td>
+        <td>@auto.KmStand</td>
+        <td>@auto.AantalDeuren</td>
+        <td>@auto.Transmissie</td>
+        <td>@auto.Brandstof</td>
+        <td>@auto.EersteInschrijving</td>
+        <td>@auto.Kleur</td>
+    </tr>
+   } 
+</table>

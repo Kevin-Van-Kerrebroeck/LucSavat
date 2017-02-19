@@ -1,0 +1,54 @@
+﻿@model Project_LucSavat.Models.ViewModels.VehicleViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            @using (Html.BeginForm("CreateVehicle", "Admin", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table class="table table-bordered">
+                    @*<tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Merk, new { @class = "control-label" })</td>
+                        <td>@Html.TextBoxFor(v => v.Vehicle.Merk, new { @class = "form-control" })</td>
+                    </tr>*@
+                    <tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Type, new { @class = "control-label" })</td>
+                        <td>@Html.TextBoxFor(v => v.Vehicle.Type, new { @class = "form-control" })</td>
+                    </tr>
+                    @*<tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.EersteInschrijving, new { @class = "control-label" })</td>
+                        <td>@Html.EditorFor(v => v.Vehicle.EersteInschrijving, new { @class = "form-control" })</td>
+                    </tr>*@
+                    <tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.KmStand, new { @class = "control-label" })</td>
+                        <td>@Html.TextAreaFor(v => v.Vehicle.KmStand, new { @class = "form-control" })</td>
+                    </tr>
+                    @*<tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Transmissie, new { @class = "control-label" })</td>
+                        <td>@Html.TextAreaFor(v => v.Vehicle.Transmissie, new { @class = "form-control" })</td>
+                    </tr>*@
+                    <tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Kleur, new { @class = "control-label" })</td>
+                        <td>@Html.TextAreaFor(v => v.Vehicle.Kleur, new { @class = "form-control" })</td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.AantalDeuren, new { @class = "control-label" })</td>
+                        <td>@Html.TextAreaFor(v => v.Vehicle.AantalDeuren, new { @class = "form-control" })</td>
+                    </tr>                 
+                    @*<tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Brandstof, new { @class = "control-label" })</td>
+                        <td>@Html.TextAreaFor(v => v.Vehicle.Brandstof, new { @class = "form-control" })</td>
+                    </tr>*@
+                    @*<tr>
+                        <td>@Html.LabelFor(v => v.Vehicle.Opties, new { @class = "control-label" })</td>
+                        <td>@Html.DropDownListFor(v => v.Vehicle.Opties, Model.Opties, new { @class = "form-control" })</td>
+                    </tr>*@
+                </table>
+
+                <input type="submit" value="Zoekertje Aanmaken" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+            }
+        </div>
+    </div>
+</div>
