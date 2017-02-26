@@ -16,13 +16,14 @@ namespace Project_LucSavat.Models
         public string Type { get; set; }
 
         //Specificaties
-        public DateTime EersteInschrijving { get; set; }
+        public string EersteInschrijving { get; set; }
         public int KmStand { get; set; }
         public TransmissieType Transmissie { get; set; }
         public Brandstof Brandstof { get; set; }
         public string Kleur { get; set; }
         public int AantalDeuren { get; set; }
 
+        //Mapping Properties
         public List<Optie> Opties { get; set; }
 
         //CONSTRUCTORS

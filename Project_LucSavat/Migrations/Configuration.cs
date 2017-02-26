@@ -34,7 +34,7 @@ namespace Project_LucSavat.Migrations
                 new Vehicle() {
                     Merk = Merken.Audi,
                     Type ="A3",
-                    EersteInschrijving = new DateTime(2001,1,1),
+                    EersteInschrijving = "2001",
                     Brandstof = Brandstof.Diesel,
                     KmStand = 12000,
                     Transmissie = TransmissieType.Manueel,
@@ -44,7 +44,7 @@ namespace Project_LucSavat.Migrations
                 new Vehicle() {
                     Merk = Merken.Renault,
                     Type ="Clio",
-                    EersteInschrijving = new DateTime(2002,1,1),
+                    EersteInschrijving = "2001",
                     Brandstof = Brandstof.Benzine,
                     KmStand = 12000,
                     Transmissie = TransmissieType.Manueel,
@@ -54,7 +54,7 @@ namespace Project_LucSavat.Migrations
                 new Vehicle() {
                     Merk = Merken.Honda,
                     Type ="Civic",
-                    EersteInschrijving = new DateTime(1998,1,1),
+                    EersteInschrijving = "2001",
                     Brandstof = Brandstof.Benzine,
                     KmStand = 120000,
                     Transmissie = TransmissieType.Manueel,

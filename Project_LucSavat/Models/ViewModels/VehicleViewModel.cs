@@ -10,6 +10,13 @@ namespace Project_LucSavat.Models.ViewModels
     {
 
         public Vehicle Vehicle { get; set; }
-        public SelectList Opties { get; set; }
+        public SelectList VehicleDropDown { get; set; }
+        public List<OptieCheckBoxViewModel> OptiesCheckBox { get; set; }
+
+        public VehicleViewModel()
+        {
+            OptiesCheckBox = new List<OptieCheckBoxViewModel>();
+        }
+
     }
 }

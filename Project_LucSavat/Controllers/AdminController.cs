@@ -20,17 +20,19 @@ namespace Project_LucSavat.Controllers
         {
             var vZoekertjes = db.Zoekertjes.Include(z => z.Vehicle);
             var vVehicles = db.Vehicles.Include(v => v.Opties);
+            var vOpties = db.Opties;
             var vView = new AdminViewModel()
             {
                 Zoekertjes = vZoekertjes.ToList(),
-                Vehicles = vVehicles.ToList()
+                Vehicles = vVehicles.ToList(),
+                Opties = vOpties.ToList()
             };
 
             return View(vView);
         }
 
         /*********ZOEKERTJES**********/
-
+        #region Zoekertjes
         // GET: Zoekertjes/Create
         public ActionResult CreateZoekertje()
         {
@@ -69,13 +71,13 @@ namespace Project_LucSavat.Controllers
             //Show
             return RedirectToAction("Index");
         }
-        
-        
+
+
         // GET: Zoekertjes/Edit/5
         public ActionResult EditZoekertje(int? id)
         {
             //Controlle Op ID
-            if(id == null)
+            if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -86,7 +88,7 @@ namespace Project_LucSavat.Controllers
                 .SingleOrDefault(z => z.Id == id);
 
             //Controle op zoekertje
-            if(vZoekertje == null)
+            if (vZoekertje == null)
             {
                 return HttpNotFound();
             }
@@ -150,16 +152,27 @@ namespace Project_LucSavat.Controllers
 
             return RedirectToAction("Index");
         }
+        #endregion
 
         /*********AUTOS**********/
+        #region Vehicles
         // GET: Vehicles/Create
         public ActionResult CreateVehicle()
         {
             //ViewModel aanmaken
             VehicleViewModel vView = new VehicleViewModel();
 
-            //SelectList van ViewModel opvullen voor gebruik van dropdown in de view
-            vView.Opties = new SelectList(db.Opties, "Id", "Naam");
+            //Lijst van OptieCheckBoxViewModel opvullen met de gegevens uit Optie om alle opties te kunnen weergeven
+            foreach (var o in db.Opties)
+            {
+                Optie Optie = db.Opties.Find(o.Id);
+                vView.OptiesCheckBox.Add(new OptieCheckBoxViewModel()
+                {
+                    Id = o.Id,
+                    Naam = o.Naam,
+                    Checked = false
+                });
+            }
 
             //Show
             return View(vView);
@@ -172,15 +185,25 @@ namespace Project_LucSavat.Controllers
         {
             //Controle
             //if (ModelState.IsValid)
-            //{
+            {
                 //Nieuw Vehicle Object aanmaken en gegevens die uit het ViewModel komen daarvoor gebruiken
                 Vehicle vehicle = new Vehicle();
                 vehicle = vVehicle.Vehicle;
+                foreach (var o in vVehicle.OptiesCheckBox)
+                {
+                    if (o.Checked)
+                    {
+                        Optie vOptie = db.Opties.Find(o.Id);
+                        vehicle.Opties.Add(vOptie);
+                    }
+
+                }
+
 
                 //Vehicle toevoegen aan db en wijzigingen opslaan
                 db.Vehicles.Add(vehicle);
                 db.SaveChanges();
-            //}
+            }
 
             //Show
             return RedirectToAction("Index");
@@ -196,10 +219,10 @@ namespace Project_LucSavat.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            //Nieuw Vehicle Object aanmaken, eager loading met Include voor vehicle (zodat een link naar het vehicle kan voorzien worden??)
+            //Nieuw Vehicle Object aanmaken, eager loading met Include voor Opties
             Vehicle vVehicle = db.Vehicles
                 .Include(v => v.Opties)
-                .SingleOrDefault(z => z.Id == id);
+                .SingleOrDefault(v => v.Id == id);
 
             //Controle op vehicle
             if (vVehicle == null)
@@ -207,13 +230,28 @@ namespace Project_LucSavat.Controllers
                 return HttpNotFound();
             }
 
-            //Vehicle in ViewModel steken, Select List aanmaken
+            //Vehicle in ViewModel steken
             VehicleViewModel vView = new VehicleViewModel()
             {
-                Vehicle = vVehicle,
-                Opties = new SelectList(db.Opties, "Id", "Naam")
-            };
+                Vehicle = vVehicle
 
+            };
+            //Checkbox lijst opvullen
+            foreach (var o in db.Opties)
+            {
+                vView.OptiesCheckBox.Add(new OptieCheckBoxViewModel()
+                {
+                    Id = o.Id,
+                    Naam = o.Naam,
+                    Checked = (vView.Vehicle.Opties.Contains(o) ? true : false)
+                });
+            }
+
+            //foreach (var o in vView.Vehicle.Opties)
+            //{
+            //    int vId = o.Id;
+            //    vView.OptiesCheckBox.Find(v => v.Id == vId).Checked = true;
+            //}
             //Show
             return View(vView);
         }
@@ -223,28 +261,70 @@ namespace Project_LucSavat.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult EditVehicle(VehicleViewModel vVehicle)
         {
-            //Controle
+            //Source:http://stackoverflow.com/a/14460197/2715331 "Updating many to many relationships"
+
+            //Controle op model state
             if (ModelState.IsValid)
             {
-                //Controle
-                if (vVehicle.Vehicle == null)
+
+
+                //Ophalen van Entry in Context (db) aan de hand van vVehicle
+                Vehicle vehicle = db.Vehicles
+                    .Include(v => v.Opties)
+                    .SingleOrDefault(v => v.Id == vVehicle.Vehicle.Id);
+
+                //controle
+                if (vehicle == null)
                 {
-                    return HttpNotFound();
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
 
-                //State van Vehicle wijzigen en wijzigingen opslaan
-                db.Entry(vVehicle.Vehicle).State = EntityState.Modified;
+                //Opties Uit de checkbox lijst toevoegen of verwijderen aan het opgehaalde object
+                foreach (var optie in vVehicle.OptiesCheckBox)
+                {
+                    Optie o = db.Opties.Find(optie.Id);
+                    bool hasOptie = vehicle.Opties.Contains(o);
+                    bool isChecked = optie.Checked;
+
+                    if (isChecked && !hasOptie)
+                    {
+                        vehicle.Opties.Add(o);
+                    }
+                    else if (!isChecked && hasOptie)
+                    {
+                        vehicle.Opties.Remove(o);
+                    }
+                }
+
+                //wijzigingen opslaan
                 db.SaveChanges();
-
-                //Bevestigings boodschap meegeven
-                ViewBag.Info = "Gegevens gewijzigd: " + DateTime.Now.ToShortTimeString();
-
-                //Show
-                vVehicle.Opties = new SelectList(db.Opties, "Id", "Naam");
-                return View(vVehicle);
+                return RedirectToAction("Index");
             }
 
             return View(vVehicle);
+            #region code from SO
+            //var vehicleX = db.Entry(vVehicle.Vehicle);
+            //vehicleX.State = EntityState.Modified;
+            //vehicleX.Collection(v => v.Opties).Load();
+
+            //foreach (var o in vVehicle.OptiesCheckBox)
+            //{
+            //    if (o.Checked)
+            //    {
+            //        var optie = db.Opties.Find(o.Id);
+            //        vVehicle.Vehicle.Opties.Add(optie);
+            //    }else
+            //    {
+            //        var optie = db.Opties.Find(o.Id);
+            //        vVehicle.Vehicle.Opties.Remove(optie);
+            //    }
+
+            //}
+
+            //db.SaveChanges();
+            //return RedirectToAction("Index");
+            #endregion
+
         }
 
         // POST: Vehicles/Delete/5
@@ -266,8 +346,94 @@ namespace Project_LucSavat.Controllers
 
             return RedirectToAction("Index");
         }
-        /*********OPTIES**********/
+        #endregion
 
+        /*********OPTIES**********/
+        #region Opties
+        public ActionResult CreateOptie()
+        {
+            //Show
+            return View();
+        }
+
+        // POST: Opties/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateOptie(Optie vOptie)
+        {
+            //Controle
+            if (ModelState.IsValid)
+            {
+                //Optie toevoegen aan db en wijzigingen opslaan
+                db.Opties.Add(vOptie);
+                db.SaveChanges();
+            }
+
+            //Show
+            return RedirectToAction("Index");
+        }
+
+
+        // GET: Opties/Edit/5
+        public ActionResult EditOptie(int? id)
+        {
+            //Controle Op ID
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Optie vOptie = db.Opties.Find(id);
+
+            //Controle op object
+            if (vOptie == null)
+            {
+                return HttpNotFound();
+            }
+
+            //Show
+            return View(vOptie);
+        }
+
+        // POST: Opties/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditOptie(Optie vOptie)
+        {
+            //Controle op state
+            if (ModelState.IsValid)
+            {
+                //Entity markeren als modified
+                db.Entry(vOptie).State = EntityState.Modified;
+
+                //wijzigingen opslaan
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(vOptie);
+
+        }
+
+        // POST: Opties/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteOptie(int? id)
+        {
+            //Controle
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Optie vinden
+            Optie vOptie = db.Opties.Find(id);
+
+            //Optie verwijderen en wijziging opslaan
+            db.Opties.Remove(vOptie);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+        #endregion
         /***********EXTRAS************/
         protected override void Dispose(bool disposing)
         {
